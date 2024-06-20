@@ -1,0 +1,8 @@
+{
+  "/forgot-pass/page": "app/forgot-pass/page.js",
+  "/blog/page": "app/blog/page.js",
+  "/page": "app/page.js",
+  "/blog-single/page": "app/blog-single/page.js",
+  "/Admin/page": "app/Admin/page.js",
+  "/Admin/Products/page": "app/Admin/Products/page.js"
+}
