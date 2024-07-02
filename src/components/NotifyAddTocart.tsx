@@ -10,6 +10,8 @@ interface Props {
   variantActive: number;
   sizeSelected: string;
   qualitySelected: number;
+  price:number;
+  name :string
 }
 
 const NotifyAddTocart: FC<Props> = ({
@@ -18,8 +20,10 @@ const NotifyAddTocart: FC<Props> = ({
   variantActive,
   qualitySelected,
   sizeSelected,
+  price,
+  name
 }) => {
-  const { name, price, variants } = PRODUCTS[0];
+  const {  variants } = PRODUCTS[0];
 
   const renderProductCartOnNotify = () => {
     return (

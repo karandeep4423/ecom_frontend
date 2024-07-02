@@ -1,62 +1,72 @@
-// import axios from "axios";
-// import { userConstants } from "../constants/user";
+import axios from "axios";
 
-// // Add a request interceptor
-// axios.interceptors.request.use(
-//   async function (config) {
-//     const token = await AsyncStorage.getItem(userConstants.tokenVariable);
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
+const userConstants = {
+  tokenVariable: 'x-auth-token',
+  jwtSign: 'JWT_SECRET',
+};
 
-//     return config;
-//   },
-//   function (error) {
-//     return Promise.reject(error);
-//   }
-// );
 
-// // Add a response interceptor
-// axios.interceptors.response.use(
-//   async function (response) {
-//     const token = response?.data?.body?.accesstoken;
-//     if (token) {
-//       await AsyncStorage.setItem(userConstants.tokenVariable, token);
-//     }
-//     return response;
-//   },
-//   async function (error) {
-//     if (error?.response?.data?.status === 401) {
-//       await AsyncStorage.removeItem(userConstants.tokenVariable);
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+// Add a request interceptor
+axios.interceptors.request.use(
+  function (config) {
+    config.headers[userConstants.tokenVariable] = localStorage.getItem(
+      userConstants.tokenVariable
+    );
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
 
-// export default axios;
+// Add a response interceptor
+axios.interceptors.response.use(
+  function (response) {
+    const token = response?.headers[userConstants.tokenVariable];
+    if (token) localStorage.setItem(userConstants.tokenVariable, token);
+    return response;
+  },
+  function (error) {
+    if (error?.response?.data?.statusCode === 403) {
+      localStorage.removeItem(userConstants.tokenVariable);
+      localStorage.removeItem("persist:root");
+      localStorage.clear();
+      window.location.replace("/");
+    }
+    return Promise.reject(error);
+  }
+);
+
+
+export default axios;
 
 export const API_ENDPOINTS = {
   auth: {
-    login: "/auth/login",
-    logout: "/auth/logout",
-    signup: "/auth/signup",
-    Forgot: "/auth/forgotpassword",
-   
+    login: "/users/login",
+    logout: "/users/logout",
+    signup: "/users",
+    forgot: "/users/forgotpassword",
+  },
+  product: {
+    getAll: "/products",
+    addProduct: "/products",
+    updateProduct:"/products",
+    deleteProduct:"/products"
   },
 
-
-  Product: {
-    GetAll: "/products",
-    GetSingle: "/booking",
-    AddBookingService: "/booking",
-    changestatus: "/booking/status",
-    GetBookingService: "/booking/service",
-    FilterData: "/booking/filter",
-    AssignBooking: "/booking/assignagent",
-    bookingComplete: "/booking/complete",
-    bookingcompleteCustomer: "/booking/customercomplete",
-    Earning:"/booking/earning"
+  order: {
+    getAll: "/orders",
+    addOrder: "/orders",
+    updateOrder:"/orders",
+    deleteOrder:"/orders"
   },
- 
+
+  cart:{
+    getAll: "/carts",
+    addCart: "/carts",
+    updateCart:"/carts",
+    deleteCart:"/carts"
+  }
+
+  
 };
-

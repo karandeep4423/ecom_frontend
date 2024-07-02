@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { getAllProductAsync, createProductAsync, updateProductAsync, deleteProductAsync } from "@/lib/features/ProductSlice";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -6,11 +6,6 @@ import { RootState } from "@/lib/store";
 import { useAppDispatch } from "@/lib/hooks";
 import { IoAdd, IoPencilOutline, IoTrash } from "react-icons/io5";
 import { Product } from "@/data/data";
-
-interface Shop {
-  id: number;
-  branchName: string;
-}
 
 interface FormData {
   name: string;
@@ -23,18 +18,40 @@ interface FormData {
 
 const Page = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const dispatch = useAppDispatch();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const { Products, loading } = useSelector((state: RootState) => state.Product);
-  const [editShop, setEditShop] = useState<any | null>(null);
-  const [deleteId, setDeleteId] = useState<any | null>(null);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(getAllProductAsync())
+    dispatch(getAllProductAsync());
   }, [dispatch]);
 
-  console.log('products', Products)
 
-  // State variables to hold form data
+
+
+  const confirmDelete = () => {
+    if (deleteId !== null) {
+      dispatch(deleteProductAsync(deleteId))
+        .then(() => {
+          setDeleteId(null);
+          setDeleteModal(false);
+          dispatch(getAllProductAsync());
+        })
+        .catch((error: Error) => {
+          console.error("Error:", error);
+        });
+    }
+  };
+
+
+
+
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     price: '',
@@ -45,7 +62,6 @@ const Page = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Function to handle changes in form inputs
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -57,50 +73,42 @@ const Page = () => {
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImageFile(e.target.files[0]);
+   
+      
     }
   };
 
-  const handleEdit = (shop: Shop) => {
-    setEditShop(shop);
+  const handleEdit = (product: Product) => {
+    setEditProduct(product);
     setFormData({
-      name: '',
-      price: '',
-      image: '',
-      description: '',
-      tags: [],
-      status: ''
-    }); // Assuming form data reset
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      description: product.description,
+      tags: product.tags,
+      status: product.status
+    });
     setIsOpen(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    let imageUrl = formData.image;
+    const data = { ...formData };
     if (imageFile) {
-      // Here you can upload the image to your backend and get the URL
-      // const uploadedImageUrl = await uploadImage(imageFile);
-      const uploadedImageUrl = URL.createObjectURL(imageFile); // For demo purposes, replace with actual upload logic
-      imageUrl = uploadedImageUrl;
+    console.log('imgae file',imageFile.name)
+
+      data.image = imageFile.name;
     }
 
-    const data = { ...formData, image: imageUrl };
+    if (editProduct) {
+      data.id = editProduct.id;
 
-    if (editShop) {
-      (data as any).branchId = editShop.id;
-
-      console.log('delete icon', data);
+      console.log('edit product', data);
       dispatch(updateProductAsync(data))
         .then(() => {
-          setFormData({
-            name: '',
-            price: '',
-            image: '',
-            description: '',
-            tags: [],
-            status: ''
-          });
-          setEditShop(null);
+          resetForm();
+          setEditProduct(null);
           setIsOpen(false);
           dispatch(getAllProductAsync());
         })
@@ -110,15 +118,8 @@ const Page = () => {
     } else {
       dispatch(createProductAsync(data))
         .then(() => {
-          setFormData({
-            name: '',
-            price: '',
-            image: '',
-            description: '',
-            tags: [],
-            status: ''
-          });
           setIsOpen(false);
+          resetForm();
           dispatch(getAllProductAsync());
         })
         .catch((error: Error) => {
@@ -127,10 +128,21 @@ const Page = () => {
     }
   };
 
-  const handleDelete = (shopId: any) => {
-    console.log('id', shopId)
-    setDeleteId(shopId); // Set the ID of the shop to be deleted
-    setDeleteId(true); // Open confirmation modal
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      price: '',
+      image: '',
+      description: '',
+      tags: [],
+      status: ''
+    });
+    setImageFile(null);
+  };
+
+  const handleDelete = (productId: number) => {
+    setDeleteId(productId);
+    setDeleteModal(true);
   };
 
   const openModal = () => {
@@ -140,12 +152,32 @@ const Page = () => {
 
   const closeModal = () => {
     setIsOpen(false);
+    setEditProduct(null);
     document.body.style.overflow = 'auto';
+  };
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredProducts = Products?.products?.filter(product =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const itemsPerPage = 10; // Number of items per page
+  const totalPages = Math.ceil(Products?.pagination?.totalItems / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = filteredProducts?.slice(startIndex, endIndex);
+
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
     <section className='bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 mt-7 mb-0 mx-6 px-5 py-6 min-h-screen rounded-lg'>
-      <h1 className='text-gray-800 dark:text-gray-200 text-3xl font-medium'>Product</h1>
+      <h1 className='text-gray-800 dark:text-gray-200 text-3xl font-medium'>Product</      h1>
 
       <div className="header flex justify-between items-center pt-6 mx-2">
         <div className="search_bar mr-2">
@@ -169,9 +201,9 @@ const Page = () => {
             <input
               type="text"
               className="md:w-64 lg:w-72 py-2 pl-10 pr-4 text-gray-800 dark:text-gray-200 bg-transparent border border-[#D9D9D9] rounded-lg focus:border-[#D9D9D9] focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] placeholder:text-sm dark:placeholder:text-gray-300"
-              placeholder="Search by Design Number"
-              // value={searchText}
-              // onChange={handleSearch}
+              placeholder="Search by Product Name"
+              value={searchQuery}
+              onChange={handleSearch}
             />
           </div>
         </div>
@@ -188,6 +220,9 @@ const Page = () => {
           </div>
         </div>
       ) : (
+<>
+
+
         <div className="relative mx-4 my-4 overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -210,36 +245,28 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {Products.map((data: Product) => (
-                <tr key={data.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <td className="p-4">
-                    <img
-                      src={data.image}
-                      className="w-16 md:w-20 max-w-full max-h-full"
-                      alt="Product"
-                    />
+              {paginatedProducts?.map((product) => (
+                <tr key={product.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td className="w-20 p-2">
+                    <img className="w-12 h-12 rounded-full" src={product.image} alt="Product" />
                   </td>
                   <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                    {data.name}
+                    {product.name}
                   </td>
                   <td className="px-6 py-4">
-                    {data.status}
-                  </td>
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                    {data.price}
+                    <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${product.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {product.status}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      onClick={() => handleEdit(data)}
-                    >
-                      <IoPencilOutline size={22} />
+                    ${product.price}
+                  </td>
+                  <td className="px-6 py-4 flex items-center gap-4">
+                    <button onClick={() => handleEdit(product)} className="inline-block rounded-sm border border-gray-700 bg-gray-600 p-1 hover:bg-gray-800 focus:outline-none focus:ring-0">
+                      <IoPencilOutline size={20} className="text-white" />
                     </button>
-                    <button
-                      className="font-medium text-red-600 dark:text-red-500 hover:underline ml-2"
-                      onClick={() => handleDelete(data.id)}
-                    >
-                      <IoTrash size={22} />
+                    <button onClick={() => handleDelete(product.id)} className="inline-block rounded-sm border border-gray-700 bg-gray-600 p-1 hover:bg-gray-800 focus:outline-none focus:ring-0">
+                      <IoTrash size={20} className="text-white" />
                     </button>
                   </td>
                 </tr>
@@ -247,130 +274,119 @@ const Page = () => {
             </tbody>
           </table>
         </div>
+
+        <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+            <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+              Showing{" "}
+              <span className="font-semibold text-gray-900 dark:text-white">
+                {startIndex + 1}-{Math.min(endIndex, Products?.pagination?.totalItems)}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-gray-900 dark:text-white">{Products?.pagination?.totalItems}</span>
+            </span>
+            <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Previous
+                </button>
+              </li>
+              {Array.from(Array(totalPages).keys()).map((page) => (
+                <li key={page}>
+                  <button
+                    onClick={() => handlePageChange(page + 1)}
+                    className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
+                      currentPage === page + 1 ? 'text-blue-600 bg-blue-50 border-blue-300' : ''
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+
+          </>
+
+
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-smoke-800 flex">
-          <div className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg border border-gray-700">
-            <button
-              onClick={closeModal}
-              className="absolute top-0 right-0 mt-4 mr-4 text-gray-700 hover:text-gray-900"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="relative w-full max-w-2xl p-8 bg-white dark:bg-gray-900 rounded-lg shadow-md">
+            <button onClick={closeModal} className="absolute top-4 right-4 text-gray-800 dark:text-gray-200 focus:outline-none">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Name
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+              {editProduct ? 'Edit Product' : 'Add New Product'}
+            </h2>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700 dark:text-gray-200 mb-2">
+                  Product Name
                 </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="text" id="name" name="name" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" value={formData.name} onChange={handleChange} required />
               </div>
 
-              <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+              <div className="mb-4">
+                <label htmlFor="price" className="block text-gray-700 dark:text-gray-200 mb-2">
                   Price
                 </label>
-                <input
-                  type="text"
-                  id="price"
-                  name="price"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  value={formData.price}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="number" id="price" name="price" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" value={formData.price} onChange={handleChange} required />
               </div>
 
-              <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+              <div className="mb-4">
+                <label htmlFor="image" className="block text-gray-700 dark:text-gray-200 mb-2">
                   Image
                 </label>
-                <input
-                  type="file"
-                  id="image"
-                  name="image"
-                  accept="image/*"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  onChange={handleImageChange}
-                />
+                <input type="file" id="image" name="image" accept="image/*" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" onChange={handleImageChange} />
+                {formData.image && <img src={formData.image} alt="Selected" className="mt-4 w-32 h-32 object-cover rounded-md" />}
               </div>
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <div className="mb-4">
+                <label htmlFor="description" className="block text-gray-700 dark:text-gray-200 mb-2">
                   Description
                 </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={3}
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                ></textarea>
+                <textarea id="description" name="description" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" value={formData.description} onChange={handleChange} required></textarea>
               </div>
 
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                  Tags (comma separated)
+              <div className="mb-4">
+                <label htmlFor="tags" className="block text-gray-700 dark:text-gray-200 mb-2">
+                  Tags
                 </label>
-                <input
-                  type="text"
-                  id="tags"
-                  name="tags"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  value={formData.tags.join(', ')}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="text" id="tags" name="tags" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" value={formData.tags.join(', ')} onChange={handleChange} required />
               </div>
 
-              <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+              <div className="mb-4">
+                <label htmlFor="status" className="block text-gray-700 dark:text-gray-200 mb-2">
                   Status
                 </label>
-                <select
-                  id="status"
-                  name="status"
-                  className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none focus:ring"
-                  value={formData.status}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" disabled>Select status</option>
-                  <option value="available">Available</option>
-                  <option value="out-of-stock">Out of Stock</option>
+                <select id="status" name="status" className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md focus:ring focus:ring-opacity-40 focus:ring-[#D9D9D9] border border-gray-300 dark:border-gray-600" value={formData.status} onChange={handleChange} required>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-between">
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-500 focus:outline-none focus:bg-blue-500"
-                >
-                  {editShop ? 'Update' : 'Add'} Product
+              <div className="flex justify-end">
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring-0">
+                  {editProduct ? 'Update Product' : 'Add Product'}
                 </button>
               </div>
             </form>
@@ -378,25 +394,18 @@ const Page = () => {
         </div>
       )}
 
-      {deleteId !== null && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-smoke-800 flex">
-          <div className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg border border-gray-700">
-            <p className="text-gray-700">Are you sure you want to delete this product?</p>
-            <div className="flex items-center justify-between mt-4">
-              <button
-                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-500 focus:outline-none focus:bg-red-500"
-                onClick={() => {
-                  dispatch(deleteProductAsync(deleteId));
-                  setDeleteId(null);
-                  dispatch(getAllProductAsync());
-                }}
-              >
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="relative w-full max-w-md p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+              Delete Product
+            </h2>
+            <p className="mb-4">Are you sure you want to delete this product?</p>
+            <div className="flex justify-end">
+              <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded-md focus:outline-none focus:ring-0 mr-2">
                 Delete
               </button>
-              <button
-                className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-500 focus:outline-none focus:bg-gray-500"
-                onClick={() => setDeleteId(null)}
-              >
+              <button onClick={() => setDeleteModal(false)} className="px-4 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-0">
                 Cancel
               </button>
             </div>

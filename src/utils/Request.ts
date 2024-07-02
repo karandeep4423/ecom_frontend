@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from './axios';
 
 const HOST_API = `http://Localhost:3001/api/v1`;
 
@@ -8,8 +8,9 @@ interface RequestParams {
 }
 
 export const postRequest = async ({ endpoint, payload }: RequestParams): Promise<any> => {
-  console.log('endpoint ', HOST_API, endpoint, payload);
+  
   const response = await axios.post(`${HOST_API}${endpoint}`, payload);
+console.log('response slices',response)
   return response;
 };
 

@@ -1,18 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+
 import toast from "react-hot-toast";
-import { getRequest, postRequest } from "@/utils/Request";
+import { getRequest, postRequest, putRequest } from "@/utils/Request";
 import { API_ENDPOINTS } from "@/utils/axios";
 
 interface UserState {
-  createUser: any;
+ 
   user: any;
   loading: boolean;
 
 }
 
 const initialState: UserState = {
-  createUser: null,
+
   user: null,
   loading: false,
  
@@ -29,10 +29,12 @@ export const createUserAsync = createAsyncThunk(
       });
       toast.success(response.data.message);
       console.log(response.data);
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
-      console.log(error.response.data.error);
-      toast.error(error.response.data.error);
+      console.log(error.response.data.message);
+
+      toast.error(error.response.data.message);
+
       throw error;
     }
   }
@@ -42,15 +44,18 @@ export const loginUserAsync = createAsyncThunk(
   "user/login",
   async (formData: any) => {
     try {
-      const response = await getRequest({
+      const response = await postRequest({
         endpoint: `${API_ENDPOINTS.auth.login}`,
+        payload:formData
       });
+     
       toast.success(response.data.message);
-      console.log(response);
-      return response.data;
+      
+      return response.data.data;
+
     } catch (error: any) {
-      console.log(error.response.data.error);
-      toast.error(error.response.data.error);
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
       throw error;
     }
   }
@@ -67,7 +72,8 @@ export const logoutUserAsync = createAsyncThunk("user/logout", async () => {
     return response.data;
   } catch (error: any) {
     console.log(error.response.data.error);
-    toast.error(error.response.data.error);
+    toast.error(error.response.data.message);
+
     throw error;
   }
 });
@@ -76,15 +82,42 @@ export const forgetUserAsync = createAsyncThunk(
   "user/forget",
   async (formData: any) => {
     try {
-      const response = await getRequest({
-        endpoint: `${API_ENDPOINTS.auth.Forgot}`,
+      const response = await putRequest({
+        endpoint: `${API_ENDPOINTS.auth.forgot}`,
+        payload:formData
+        
       });
       toast.success(response.data.message);
       console.log(response.data);
       return response.data;
     } catch (error: any) {
       console.log(error.response.data.error);
-      toast.error(error.response.data.error);
+      toast.error(error.response.data.message);
+
+      throw error;
+    }
+  }
+);
+
+
+
+export const UpdateUserAsync = createAsyncThunk(
+  "user/Update",
+  async (payload: any) => {
+   
+    try {
+      const response = await putRequest({
+        endpoint: `${API_ENDPOINTS.auth.signup}/${payload?.id}`,
+        payload:payload
+      });
+      toast.success(response.data.message);
+      console.log(response.data);
+      return response.data.data;
+    } catch (error: any) {
+      console.log(error.response.data.message);
+
+      toast.error(error.response.data.message);
+
       throw error;
     }
   }
@@ -95,9 +128,9 @@ export const forgetUserAsync = createAsyncThunk(
 
 
 
-
 const authSlice = createSlice({
   name: "auth",
+  
   initialState,
   reducers: {
     removeUserData: (state) => {
@@ -114,14 +147,16 @@ const authSlice = createSlice({
       })
       .addCase(createUserAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.createUser = action.payload;
+        state.user = action.payload
+     
       })
       .addCase(loginUserAsync.pending, (state) => {
         state.loading = true;
       })
       .addCase(loginUserAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload
+
       })
       .addCase(loginUserAsync.rejected, (state) => {
         state.loading = false;

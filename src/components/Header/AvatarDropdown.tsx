@@ -6,8 +6,14 @@ import { Fragment } from "react";
 import Avatar from "@/shared/Avatar/Avatar";
 import SwitchDarkMode2 from "@/shared/SwitchDarkMode/SwitchDarkMode2";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
+import { RootState } from "@/lib/store";
 export default function AvatarDropdown() {
+
+  const { user, loading } = useSelector((state: RootState) => state.auth);
+  console.log('user',user)
+
   return (
     <div className="AvatarDropdown ">
       <Popover className="relative">
@@ -54,8 +60,8 @@ export default function AvatarDropdown() {
                       <Avatar imgUrl={avatarImgs[7]} sizeClass="w-12 h-12" />
 
                       <div className="flex-grow">
-                        <h4 className="font-semibold">Eden Smith</h4>
-                        <p className="text-xs mt-0.5">Los Angeles, CA</p>
+                        <h4 className="font-semibold">{user?.name}</h4>
+                        <p className="text-xs mt-0.5">{user?.email}</p>
                       </div>
                     </div>
 
@@ -283,7 +289,7 @@ export default function AvatarDropdown() {
 
                     {/* ------------------ 2 --------------------- */}
                     <Link
-                      href={"/#"}
+                      href={"/"}
                       className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                       onClick={() => close()}
                     >

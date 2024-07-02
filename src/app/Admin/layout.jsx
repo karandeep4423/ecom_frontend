@@ -132,21 +132,16 @@ const AdminBody = ({children}) => {
 
                             {/* INSTOCK DROPDOWN */}
                             <li className="relative">
-                                <button
+                            <Link
                                     className="h-14 pl-4 w-full border-t flex items-center p-2 text-base font-medium bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100 group"
-                                    onClick={toggleInStockDropdown}
-                                >
+                                    href={'/Admin/Orders'}
+                              
+                              >
                                     <span className="ml-3">Orders</span>
-                                    <svg
-                                        className={`ml-auto w-4 h-4 transform ${isInStockDropdownOpen ? 'rotate-180' : ''} transition-transform`}
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                {isInStockDropdownOpen && (
+                                    
+                                </Link>
+                             
+                                {/* {isInStockDropdownOpen && (
                                     <ul className="absolute left-0 z-10 mt-2 w-full border border-gray-200 rounded shadow-lg dark:bg-gray-800 dark:border-gray-700">
 
                                      
@@ -159,15 +154,16 @@ const AdminBody = ({children}) => {
                                         </li>
 
                                     </ul>
-                                )}
+                                )} */}
                             </li>
 
                          
                             <li className="relative" >
                                 <Link
                                     className="h-14 pl-4 w-full border-t flex items-center p-2 text-base font-medium bg-[#FAFAFA] dark:bg-gray-800 text-gray-900 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-100 group"
-                                   href={'/Admin/Products'}
-                                >
+                                    href={'/Admin/Products'}
+                              
+                              >
                                     <span className="ml-3">Products</span>
                                     
                                 </Link>

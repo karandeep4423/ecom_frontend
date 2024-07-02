@@ -20,7 +20,7 @@ const PageForgotPass: FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    dispatch(forgotPasswordAsync(formData)).then(() => {
+    dispatch(forgetUserAsync(formData)).then(() => {
       setFormData({
         email: "",
       });

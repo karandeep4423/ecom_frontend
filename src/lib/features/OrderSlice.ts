@@ -7,12 +7,12 @@ import { postRequest,getRequest, deleteRequest, putRequest, postFormRequest, put
 
 
 // CREATE ASYNC THUNK
-export const createProductAsync = createAsyncThunk<any, FormData>(
-  "Product/create",
+export const createOrderAsync = createAsyncThunk<any, FormData>(
+  "Order/create",
   async (formData) => {
     try {
-        const response = await postFormRequest({
-            endpoint: `${API_ENDPOINTS.product.addProduct}`,
+        const response = await postRequest({
+            endpoint: `${API_ENDPOINTS.order.addOrder}`,
             payload:formData
           });
       toast.success(response.data.message);
@@ -26,13 +26,13 @@ export const createProductAsync = createAsyncThunk<any, FormData>(
   }
 );
 
-export const updateProductAsync = createAsyncThunk<any, FormData>(
-  "Product/update",
+export const updateOrderAsync = createAsyncThunk<any, FormData>(
+  "Order/update",
   async (formData) => {
     try {
 
-      const response = await putFormRequest({
-        endpoint: `${API_ENDPOINTS.product.updateProduct}/${formData?.id}`,
+      const response = await putRequest({
+        endpoint: `${API_ENDPOINTS.order.updateOrder}/${formData?.id}`,
         payload:formData
       });
       toast.success(response.data.message);
@@ -47,12 +47,12 @@ export const updateProductAsync = createAsyncThunk<any, FormData>(
 );
 
 // DELETE ASYNC THUNK
-export const deleteProductAsync = createAsyncThunk<any, FormData>(
-  "Product/delete",
+export const deleteOrderAsync = createAsyncThunk<any, FormData>(
+  "Order/delete",
   async (id:any) => {
     try {
       const response = await deleteRequest({
-        endpoint: `${API_ENDPOINTS.product.deleteProduct}/${id}`,
+        endpoint: `${API_ENDPOINTS.order.deleteOrder}/${id}`,
      
       });
       toast.success(response.data.message);
@@ -67,13 +67,13 @@ export const deleteProductAsync = createAsyncThunk<any, FormData>(
 );
 
 // GET ALL SHOPS ASYNC THUNK
-export const getAllProductAsync = createAsyncThunk<any>(
-  "Product/getAll",
+export const getAllOrderAsync = createAsyncThunk<any>(
+  "Order/getAll",
   async () => {
     try {
 
         const response = await getRequest({
-            endpoint: `${API_ENDPOINTS.product.getAll}`,
+            endpoint: `${API_ENDPOINTS.order.getAll}`,
           });
       toast.success(response.data.message);
       console.log(response.data);
@@ -86,43 +86,19 @@ export const getAllProductAsync = createAsyncThunk<any>(
   }
 );
 
-
-
-export const getSingleProductAsync = createAsyncThunk<any>(
-  "Product/getSingle",
-  async (id) => {
-    try {
-
-        const response = await getRequest({
-            endpoint: `${API_ENDPOINTS.product.getAll}/${id}`,
-          });
-      toast.success(response.data.message);
-      console.log(response.data);
-      return response.data;
-    } catch (error: any) {
-      console.log(error.response.data);
-      // toast.error(error.response.data.error);
-      throw error;
-    }
-  }
-);
-
-
-interface Product {
-    Products: [];
-    SingleProduct:object
+interface Order {
+    Orders: any;
     loading: boolean;
   }
   
-  const initialState: Product = {
-    Products: [],
-    SingleProduct:{},
+  const initialState: Order = {
+    Orders: [],
     loading: false,
   };
   
 
-const Product = createSlice({
-    name: "Product",
+const Order = createSlice({
+    name: "Order",
     initialState,
     reducers: {
       reset: (state) => initialState,
@@ -130,48 +106,39 @@ const Product = createSlice({
     extraReducers: (builder) => {
       builder
         // CREATE SHOP ADD CASE
-        .addCase(createProductAsync.pending, (state) => {
+        .addCase(createOrderAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(createProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        .addCase(createOrderAsync.fulfilled, (state, action: PayloadAction<any>) => {
           state.loading = false;
         })
         // GET ALL SHOPS ADD CASE
-        .addCase(getAllProductAsync.pending, (state) => {
+        .addCase(getAllOrderAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(getAllProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        .addCase(getAllOrderAsync.fulfilled, (state, action: PayloadAction<any>) => {
           state.loading = false;
-          state.Products = action.payload.data;
+          state.Orders = action.payload.data;
         })
-
-        .addCase(getSingleProductAsync.pending, (state) => {
+        .addCase(updateOrderAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(getSingleProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
-          state.loading = false;
-          state.SingleProduct = action.payload.data;
-        })
-
-        .addCase(updateProductAsync.pending, (state) => {
-          state.loading = true;
-        })
-        .addCase(updateProductAsync.fulfilled, (state) => {
+        .addCase(updateOrderAsync.fulfilled, (state) => {
           state.loading = false;
         })
         // DELETE SHOP ADD CASE
-        .addCase(deleteProductAsync.pending, (state) => {
+        .addCase(deleteOrderAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(deleteProductAsync.fulfilled, (state) => {
+        .addCase(deleteOrderAsync.fulfilled, (state) => {
           state.loading = false;
         });
     },
   });
   
-  export const { reset } = Product.actions;
+  export const { reset } = Order.actions;
   
-  export default Product.reducer;
+  export default Order.reducer;
   
 
 

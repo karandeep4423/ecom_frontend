@@ -10,6 +10,8 @@ import { useAppDispatch,useAppSelector } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
 import { getAllProductAsync } from "@/lib/features/ProductSlice";
 import { useSelector } from "react-redux";
+import { createCartAsync } from "@/lib/features/CartSlice";
+
 export interface SectionSliderProductCardProps {
   className?: string;
   itemClassName?: string;
@@ -38,9 +40,16 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   const dispatch = useAppDispatch();
   const { Products, loading } = useSelector((state:RootState) => state.Product);
   console.log('data',Products)
+
+
+
   useEffect(() => {
     dispatch(getAllProductAsync());
   }, []);
+
+
+
+
 
   useEffect(() => {
     const OPTIONS: Partial<Glide.Options> = {
@@ -96,7 +105,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides">
-            {Products.map((item:Product, index:any) => (
+            {Products?.products?.map((item:Product, index:any) => (
               <li key={index} className={`glide__slide ${itemClassName}`}>
                 <ProductCard data={item} />
               </li>

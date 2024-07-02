@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store";
 import { loginUserAsync } from "@/lib/features/userSlice"; // Assuming you have this action defined
+import { useRouter } from 'next/navigation';
 
 interface LoginFormData {
   email: string;
@@ -17,6 +18,7 @@ const PageLogin: FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const dispatch = useDispatch();
   const { loading } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -26,7 +28,9 @@ const PageLogin: FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    dispatch(loginUserAsync(formData));
+    dispatch(loginUserAsync(formData)).then(() => {
+      router.push("/"); // Navigate to the dashboard or any other page
+    });
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +90,9 @@ const PageLogin: FC = () => {
                 </button>
               </div>
             </label>
-            <ButtonPrimary type="submit">Continue</ButtonPrimary>
+            <ButtonPrimary type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Continue"}
+            </ButtonPrimary>
           </form>
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             New user?{" "}

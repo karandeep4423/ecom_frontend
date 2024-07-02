@@ -7,12 +7,15 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store";
 import { createUserAsync } from "@/lib/features/userSlice";
+import toast from "react-hot-toast";
 
-interface FormData {
+interface FormDataState {
   name: string;
   email: string;
   password: string;
+  profileImage: File | null;
   confirmPassword: string;
+  role: string;
 }
 
 const PageSignUp: FC = () => {
@@ -21,27 +24,42 @@ const PageSignUp: FC = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state: RootState) => state.auth);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<FormDataState>({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    profileImage: null,
+    role: 'customer'
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
     console.log(formData);
-    dispatch(createUserAsync(formData))
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("password", formData.password);
+    formDataToSend.append("confirmPassword", formData.confirmPassword);
+    formDataToSend.append("role", formData.role);
+    if (formData.profileImage) {
+      formDataToSend.append("profileImage", formData.profileImage);
+    }
+
+    dispatch(createUserAsync(formDataToSend))
       .then(() => {
         setFormData({
           name: "",
           email: "",
           password: "",
-          confirmPassword: ""
+          confirmPassword: "",
+          profileImage: null,
+          role: 'customer'
         });
       });
   };
@@ -52,6 +70,15 @@ const PageSignUp: FC = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({
+        ...formData,
+        profileImage: e.target.files[0]
+      });
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -97,7 +124,7 @@ const PageSignUp: FC = () => {
               />
             </label>
             <label className="block">
-              <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+              <span className="text-neutral-800 dark:text-neutral-200">
                 Password
               </span>
               <div className="relative">
@@ -118,7 +145,7 @@ const PageSignUp: FC = () => {
               </div>
             </label>
             <label className="block">
-              <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+              <span className="text-neutral-800 dark:text-neutral-200">
                 Confirm Password
               </span>
               <div className="relative">
@@ -138,7 +165,28 @@ const PageSignUp: FC = () => {
                 </button>
               </div>
             </label>
-            <ButtonPrimary type="submit">Continue</ButtonPrimary>
+            <label className="block">
+              <span className="text-neutral-800 dark:text-neutral-200">
+                Profile Image
+              </span>
+              <input
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                className="mt-1"
+                onChange={handleFileChange}
+              />
+              {formData.profileImage && (
+                <img
+                  src={URL.createObjectURL(formData.profileImage)}
+                  alt="Profile Preview"
+                  className="mt-2 h-20 w-20 object-cover"
+                />
+              )}
+            </label>
+            <ButtonPrimary type="submit" disabled={loading}>
+              {loading ? "Signing up..." : "Continue"}
+            </ButtonPrimary>
           </form>
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             Already have an account?{" "}

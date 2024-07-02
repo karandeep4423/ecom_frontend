@@ -1,30 +1,73 @@
+'use client'
+import React, { FC, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { UpdateUserAsync } from "@/lib/features/userSlice";
 import Label from "@/components/Label/Label";
-import React, { FC } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import Input from "@/shared/Input/Input";
-import Select from "@/shared/Select/Select";
-import Textarea from "@/shared/Textarea/Textarea";
-import { avatarImgs } from "@/contains/fakeData";
 import Image from "next/image";
 
-const AccountPage = () => {
+const AccountPage: FC = () => {
+  const dispatch = useDispatch();
+  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    profileImage: '',
+    id:""
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        profileImage: user.profileImage || '',
+        id:user?.id || ''
+      });
+    }
+  }, [user]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // Handle file upload logic here, e.g., updating the profileImage state with the uploaded image URL
+    }
+  };
+
+  const handleSubmit = () => {
+
+   
+  
+    dispatch(UpdateUserAsync(formData ));
+  };
+  
+
   return (
-    <div className={`nc-AccountPage `}>
+    <div className="nc-AccountPage">
       <div className="space-y-10 sm:space-y-12">
-        {/* HEADING */}
         <h2 className="text-2xl sm:text-3xl font-semibold">
-          Account infomation
+          Account information
         </h2>
         <div className="flex flex-col md:flex-row">
           <div className="flex-shrink-0 flex items-start">
-            {/* AVATAR */}
             <div className="relative rounded-full overflow-hidden flex">
               <Image
-                src={avatarImgs[2]}
+                src={formData.profileImage}
                 alt="avatar"
                 width={128}
                 height={128}
                 className="w-32 h-32 rounded-full object-cover z-0"
+                
               />
               <div className="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center text-neutral-50 cursor-pointer">
                 <svg
@@ -42,24 +85,25 @@ const AccountPage = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-
                 <span className="mt-1 text-xs">Change Image</span>
               </div>
               <input
                 type="file"
                 className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleFileChange}
               />
             </div>
           </div>
           <div className="flex-grow mt-10 md:mt-0 md:pl-16 max-w-3xl space-y-6">
             <div>
               <Label>Full name</Label>
-              <Input className="mt-1.5" defaultValue="Enrico Cole" />
+              <Input
+                className="mt-1.5"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
             </div>
-
-            {/* ---- */}
-
-            {/* ---- */}
             <div>
               <Label>Email</Label>
               <div className="mt-1.5 flex">
@@ -68,66 +112,16 @@ const AccountPage = () => {
                 </span>
                 <Input
                   className="!rounded-l-none"
-                  placeholder="example@email.com"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </div>
-            </div>
-
-            {/* ---- */}
-            <div className="max-w-lg">
-              <Label>Date of birth</Label>
-              <div className="mt-1.5 flex">
-                <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                  <i className="text-2xl las la-calendar"></i>
-                </span>
-                <Input
-                  className="!rounded-l-none"
-                  type="date"
-                  defaultValue="1990-07-22"
-                />
-              </div>
-            </div>
-            {/* ---- */}
-            <div>
-              <Label>Addess</Label>
-              <div className="mt-1.5 flex">
-                <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                  <i className="text-2xl las la-map-signs"></i>
-                </span>
-                <Input
-                  className="!rounded-l-none"
-                  defaultValue="New york, USA"
-                />
-              </div>
-            </div>
-
-            {/* ---- */}
-            <div>
-              <Label>Gender</Label>
-              <Select className="mt-1.5">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </Select>
-            </div>
-
-            {/* ---- */}
-            <div>
-              <Label>Phone number</Label>
-              <div className="mt-1.5 flex">
-                <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                  <i className="text-2xl las la-phone-volume"></i>
-                </span>
-                <Input className="!rounded-l-none" defaultValue="003 888 232" />
-              </div>
-            </div>
-            {/* ---- */}
-            <div>
-              <Label>About you</Label>
-              <Textarea className="mt-1.5" defaultValue="..." />
             </div>
             <div className="pt-2">
-              <ButtonPrimary>Update account</ButtonPrimary>
+              <ButtonPrimary onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Updating...' : 'Update account'}
+              </ButtonPrimary>
             </div>
           </div>
         </div>

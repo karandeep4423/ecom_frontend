@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/Admin/layout.jsx", "src/lib/store.ts", "src/lib/features/userSlice.ts", "src/app/StoreProvider.tsx", "src/lib/hook"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/Admin/layout.jsx", "src/lib/store.ts", "src/lib/features/userSlice.ts", "src/app/StoreProvider.tsx", "src/lib/hook", "src/app/SiteHeader.tsx", "src/app/(accounts)/account/page.tsx"],
   "exclude": ["node_modules"]
 }

@@ -10,11 +10,13 @@ import { usePathname } from "next/navigation";
 export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;
+  id :any;
 }
 
 const ModalQuickView: FC<ModalQuickViewProps> = ({
   show,
   onCloseModalQuickView,
+  id
 }) => {
   const pathname = usePathname();
 
@@ -64,7 +66,7 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                   {pathname.includes("/home-2") ? (
                     <ProductQuickView2 />
                   ) : (
-                    <ProductQuickView />
+                    <ProductQuickView id={id} />
                   )}
                 </div>
               </div>

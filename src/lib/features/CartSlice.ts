@@ -7,12 +7,12 @@ import { postRequest,getRequest, deleteRequest, putRequest, postFormRequest, put
 
 
 // CREATE ASYNC THUNK
-export const createProductAsync = createAsyncThunk<any, FormData>(
-  "Product/create",
+export const createCartAsync = createAsyncThunk<any, FormData>(
+  "Cart/create",
   async (formData) => {
     try {
-        const response = await postFormRequest({
-            endpoint: `${API_ENDPOINTS.product.addProduct}`,
+        const response = await postRequest({
+            endpoint: `${API_ENDPOINTS.cart.addCart}`,
             payload:formData
           });
       toast.success(response.data.message);
@@ -26,13 +26,13 @@ export const createProductAsync = createAsyncThunk<any, FormData>(
   }
 );
 
-export const updateProductAsync = createAsyncThunk<any, FormData>(
-  "Product/update",
+export const updateCartAsync = createAsyncThunk<any, FormData>(
+  "Cart/update",
   async (formData) => {
     try {
 
       const response = await putFormRequest({
-        endpoint: `${API_ENDPOINTS.product.updateProduct}/${formData?.id}`,
+        endpoint: `${API_ENDPOINTS.Cart.updateCart}/${formData?.id}`,
         payload:formData
       });
       toast.success(response.data.message);
@@ -47,12 +47,13 @@ export const updateProductAsync = createAsyncThunk<any, FormData>(
 );
 
 // DELETE ASYNC THUNK
-export const deleteProductAsync = createAsyncThunk<any, FormData>(
-  "Product/delete",
+export const deleteCartAsync = createAsyncThunk<any, FormData>(
+  "Cart/delete",
   async (id:any) => {
+    console.log('id',id)
     try {
       const response = await deleteRequest({
-        endpoint: `${API_ENDPOINTS.product.deleteProduct}/${id}`,
+        endpoint: `${API_ENDPOINTS.cart.deleteCart}/${id}`,
      
       });
       toast.success(response.data.message);
@@ -67,62 +68,38 @@ export const deleteProductAsync = createAsyncThunk<any, FormData>(
 );
 
 // GET ALL SHOPS ASYNC THUNK
-export const getAllProductAsync = createAsyncThunk<any>(
-  "Product/getAll",
+export const getAllCartAsync = createAsyncThunk<any>(
+  "Cart/getAll",
   async () => {
     try {
 
         const response = await getRequest({
-            endpoint: `${API_ENDPOINTS.product.getAll}`,
+            endpoint: `${API_ENDPOINTS.cart.getAll}`,
           });
       toast.success(response.data.message);
-      console.log(response.data);
+      console.log("response",response.data);
       return response.data;
     } catch (error: any) {
-      console.log(error.response.data);
+      console.log("error",error.response.data);
       // toast.error(error.response.data.error);
       throw error;
     }
   }
 );
 
-
-
-export const getSingleProductAsync = createAsyncThunk<any>(
-  "Product/getSingle",
-  async (id) => {
-    try {
-
-        const response = await getRequest({
-            endpoint: `${API_ENDPOINTS.product.getAll}/${id}`,
-          });
-      toast.success(response.data.message);
-      console.log(response.data);
-      return response.data;
-    } catch (error: any) {
-      console.log(error.response.data);
-      // toast.error(error.response.data.error);
-      throw error;
-    }
-  }
-);
-
-
-interface Product {
-    Products: [];
-    SingleProduct:object
+interface Cart {
+    Carts: any;
     loading: boolean;
   }
   
-  const initialState: Product = {
-    Products: [],
-    SingleProduct:{},
+  const initialState: Cart = {
+    Carts: [],
     loading: false,
   };
   
 
-const Product = createSlice({
-    name: "Product",
+const Cart = createSlice({
+    name: "Cart",
     initialState,
     reducers: {
       reset: (state) => initialState,
@@ -130,48 +107,39 @@ const Product = createSlice({
     extraReducers: (builder) => {
       builder
         // CREATE SHOP ADD CASE
-        .addCase(createProductAsync.pending, (state) => {
+        .addCase(createCartAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(createProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        .addCase(createCartAsync.fulfilled, (state, action: PayloadAction<any>) => {
           state.loading = false;
         })
         // GET ALL SHOPS ADD CASE
-        .addCase(getAllProductAsync.pending, (state) => {
+        .addCase(getAllCartAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(getAllProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
+        .addCase(getAllCartAsync.fulfilled, (state, action: PayloadAction<any>) => {
           state.loading = false;
-          state.Products = action.payload.data;
+          state.Carts = action.payload.data;
         })
-
-        .addCase(getSingleProductAsync.pending, (state) => {
+        .addCase(updateCartAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(getSingleProductAsync.fulfilled, (state, action: PayloadAction<any>) => {
-          state.loading = false;
-          state.SingleProduct = action.payload.data;
-        })
-
-        .addCase(updateProductAsync.pending, (state) => {
-          state.loading = true;
-        })
-        .addCase(updateProductAsync.fulfilled, (state) => {
+        .addCase(updateCartAsync.fulfilled, (state) => {
           state.loading = false;
         })
         // DELETE SHOP ADD CASE
-        .addCase(deleteProductAsync.pending, (state) => {
+        .addCase(deleteCartAsync.pending, (state) => {
           state.loading = true;
         })
-        .addCase(deleteProductAsync.fulfilled, (state) => {
+        .addCase(deleteCartAsync.fulfilled, (state) => {
           state.loading = false;
         });
     },
   });
   
-  export const { reset } = Product.actions;
+  export const { reset } = Cart.actions;
   
-  export default Product.reducer;
+  export default Cart.reducer;
   
 
 
