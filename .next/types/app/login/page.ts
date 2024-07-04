@@ -1,4 +1,4 @@
-// File: /Users/glowingsofttechnologies/Downloads/Ecommerce Test/e-commerce-FE/src/app/login/page.tsx
+// File: /Users/glowingsofttechnologies/Documents/GitHub/e-commerce/src/app/login/page.tsx
 import * as entry from '../../../../src/app/login/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

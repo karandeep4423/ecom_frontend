@@ -3,7 +3,7 @@ import { getAllProductAsync, createProductAsync, updateProductAsync, deleteProdu
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { IoAdd, IoPencilOutline, IoTrash } from "react-icons/io5";
 import { Product } from "@/data/data";
 
@@ -22,12 +22,12 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const { Products, loading } = useSelector((state: RootState) => state.Product);
+  const { Products, loading } = useAppSelector((state: RootState) => state.product);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
-  useEffect(() => {
+useEffect(() => {
     dispatch(getAllProductAsync());
   }, [dispatch]);
 

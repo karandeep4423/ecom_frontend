@@ -76,8 +76,7 @@ export const getAllCartAsync = createAsyncThunk<any>(
         const response = await getRequest({
             endpoint: `${API_ENDPOINTS.cart.getAll}`,
           });
-      toast.success(response.data.message);
-      console.log("response",response.data);
+     
       return response.data;
     } catch (error: any) {
       console.log("error",error.response.data);

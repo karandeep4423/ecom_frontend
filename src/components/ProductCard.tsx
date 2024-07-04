@@ -50,6 +50,10 @@ const ProductCard: FC<ProductCardProps> = ({
   const [showModalQuickView, setShowModalQuickView] = useState(false);
   const router = useRouter();
 
+
+
+
+  
   const notifyAddTocart = ({ size }: { size?: string }) => {
     toast.custom(
       (t) => (
@@ -158,7 +162,7 @@ const ProductCard: FC<ProductCardProps> = ({
   const renderGroupButtons = () => {
     return (
       <div className="absolute bottom-0 group-hover:bottom-4 inset-x-1 flex justify-center opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-        <ButtonPrimary
+        {/* <ButtonPrimary
           className="shadow-lg"
           fontSize="text-xs"
           sizeClass="py-2 px-4"
@@ -166,7 +170,7 @@ const ProductCard: FC<ProductCardProps> = ({
         >
           <BagIcon className="w-3.5 h-3.5 mb-0.5" />
           <span className="ms-1">Add to bag</span>
-        </ButtonPrimary>
+        </ButtonPrimary> */}
         <ButtonSecondary
           className="ms-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
           fontSize="text-xs"
@@ -207,10 +211,10 @@ const ProductCard: FC<ProductCardProps> = ({
       <div
         className={`nc-ProductCard relative flex flex-col bg-transparent ${className}`}
       >
-        <Link href={"/product-detail"} className="absolute inset-0"></Link>
+        <Link href={`/product-detail/${id}`} className="absolute inset-0" passHref></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
-          <Link href={"/product-detail"} className="block">
+          <Link href={`/product-detail/${id}`} className="block" passHref>
             <NcImage
               containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
               src={image}

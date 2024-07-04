@@ -31,31 +31,31 @@ declare namespace __next_route_internal_types__ {
   type StaticRoutes = 
     | `/`
     | `/account`
-    | `/account-order`
     | `/account-billing`
+    | `/account-order`
     | `/account-password`
     | `/account-savelists`
     | `/Admin`
     | `/Admin/Orders`
     | `/Admin/Products`
     | `/about`
+    | `/api/hello`
     | `/blog`
     | `/blog-single`
     | `/cart`
-    | `/checkout`
     | `/collection`
+    | `/checkout`
     | `/collection-2`
     | `/contact`
-    | `/api/hello`
     | `/forgot-pass`
     | `/home-2`
     | `/login`
-    | `/product-detail`
     | `/product-detail-2`
-    | `/search`
     | `/signup`
+    | `/search`
     | `/subscription`
-  type DynamicRoutes<T extends string = string> = never
+  type DynamicRoutes<T extends string = string> = 
+    | `/product-detail/${SafeSlug<T>}`
 
   type RouteImpl<T> = 
     | StaticRoutes

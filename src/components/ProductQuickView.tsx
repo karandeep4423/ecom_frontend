@@ -14,7 +14,7 @@ import Link from "next/link";
 import { getSingleProductAsync } from "@/lib/features/ProductSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
-import { createCartAsync } from "@/lib/features/CartSlice";
+import { createCartAsync, getAllCartAsync } from "@/lib/features/CartSlice";
 import { useRouter } from "next/navigation";
 
 export interface ProductQuickViewProps {
@@ -24,7 +24,7 @@ export interface ProductQuickViewProps {
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", id }) => {
   const dispatch = useAppDispatch();
-  const { SingleProduct, loading } = useAppSelector((state: RootState) => state.Product);
+  const { SingleProduct, loading } = useAppSelector((state: RootState) => state.product);
   const { user } = useAppSelector((state: RootState) => state.auth);
 const router = useRouter()
 
@@ -53,6 +53,14 @@ const router = useRouter()
   };
 
   const AddtoCart = () => {
+
+if(!user)
+  {
+    toast.error('Login must')
+    return;
+  }
+    if(user)
+      {
     const data = {
       user: user?.id,
       items: [
@@ -69,12 +77,17 @@ const router = useRouter()
 
     dispatch(createCartAsync(data))
       .then(() => {
+        dispatch(getAllCartAsync())
+        notifyAddTocart();
         router.push('/')
 
       })
       .catch((error: Error) => {
         console.error("Error:", error);
       });
+
+
+    }
   };
 
   useEffect(() => {
@@ -131,7 +144,7 @@ const router = useRouter()
   onClick={() => {
     if (SingleProduct) { // Add this check
       AddtoCart();
-      notifyAddTocart();
+      
   
     } else {
       console.error("SingleProduct is not available");

@@ -1,8 +1,10 @@
 {
-  "/forgot-pass/page": "app/forgot-pass/page.js",
-  "/blog/page": "app/blog/page.js",
   "/page": "app/page.js",
-  "/blog-single/page": "app/blog-single/page.js",
+  "/product-detail/[id]/page": "app/product-detail/[id]/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/login/page": "app/login/page.js",
+  "/(accounts)/account/page": "app/(accounts)/account/page.js",
   "/Admin/page": "app/Admin/page.js",
-  "/Admin/Products/page": "app/Admin/Products/page.js"
+  "/Admin/Products/page": "app/Admin/Products/page.js",
+  "/Admin/Orders/page": "app/Admin/Orders/page.js"
 }

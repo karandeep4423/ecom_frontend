@@ -3,7 +3,7 @@ import { getAllProductAsync, createProductAsync, updateProductAsync, deleteProdu
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { IoAdd, IoPencilOutline, IoTrash } from "react-icons/io5";
 import { Order } from "@/data/data";
 import { deleteOrderAsync, getAllOrderAsync, updateOrderAsync } from "@/lib/features/OrderSlice";
@@ -21,7 +21,7 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const dispatch = useAppDispatch();
-  const { Orders, loading } = useSelector((state: RootState) => state.Order);
+  const { Orders, loading } = useAppSelector((state: RootState) => state.order);
  
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editOrder, setEditOrder] = useState<Order | null>(null);

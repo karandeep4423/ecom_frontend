@@ -7,10 +7,11 @@ import Label from "@/components/Label/Label";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import Input from "@/shared/Input/Input";
 import Image from "next/image";
+import { useAppSelector } from "@/lib/hooks";
 
 const AccountPage: FC = () => {
   const dispatch = useDispatch();
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { user, loading } = useAppSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

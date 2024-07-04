@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { deleteCartAsync, getAllCartAsync } from "@/lib/features/CartSlice";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { RootState } from "@/lib/store";
@@ -11,7 +11,7 @@ import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 export default function CartDropdown() {
   const dispatch = useAppDispatch();
-  const { Carts, loading } = useSelector((state: RootState) => state.Cart);
+  const { Carts, loading } = useAppSelector((state: RootState) => state.cart);
 
   useEffect(() => {
     dispatch(getAllCartAsync());

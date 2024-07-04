@@ -75,12 +75,12 @@ export const getAllProductAsync = createAsyncThunk<any>(
         const response = await getRequest({
             endpoint: `${API_ENDPOINTS.product.getAll}`,
           });
-      toast.success(response.data.message);
-      console.log(response.data);
+     
+     
       return response.data;
     } catch (error: any) {
-      console.log(error.response.data);
-      // toast.error(error.response.data.error);
+     
+      toast.error(error.response.data.error);
       throw error;
     }
   }

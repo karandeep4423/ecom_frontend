@@ -25,7 +25,7 @@ const CheckoutPage = () => {
     "ContactInfo" | "ShippingAddress" | "PaymentMethod"
   >("ShippingAddress");
   const dispatch = useAppDispatch();
-  const { Carts, loading } = useSelector((state: RootState) => state.Cart);
+  const { Carts, loading } = useSelector((state: RootState) => state.cart);
 
   const { user } = useAppSelector((state: RootState) => state.auth);
 
