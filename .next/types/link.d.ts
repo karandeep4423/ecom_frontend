@@ -31,22 +31,22 @@ declare namespace __next_route_internal_types__ {
   type StaticRoutes = 
     | `/`
     | `/account`
-    | `/account-billing`
     | `/account-order`
+    | `/account-billing`
     | `/account-password`
     | `/account-savelists`
     | `/Admin`
-    | `/Admin/Orders`
     | `/Admin/Products`
+    | `/Admin/Orders`
     | `/about`
     | `/api/hello`
-    | `/blog`
     | `/blog-single`
+    | `/blog`
     | `/cart`
-    | `/collection`
     | `/checkout`
-    | `/collection-2`
+    | `/collection`
     | `/contact`
+    | `/collection-2`
     | `/forgot-pass`
     | `/home-2`
     | `/login`

@@ -1,10 +1,10 @@
 {
   "/page": "app/page.js",
-  "/product-detail/[id]/page": "app/product-detail/[id]/page.js",
-  "/signup/page": "app/signup/page.js",
-  "/login/page": "app/login/page.js",
-  "/(accounts)/account/page": "app/(accounts)/account/page.js",
-  "/Admin/page": "app/Admin/page.js",
-  "/Admin/Products/page": "app/Admin/Products/page.js",
-  "/Admin/Orders/page": "app/Admin/Orders/page.js"
+  "/blog-single/page": "app/blog-single/page.js",
+  "/collection-2/page": "app/collection-2/page.js",
+  "/product-detail-2/page": "app/product-detail-2/page.js",
+  "/collection/page": "app/collection/page.js",
+  "/cart/page": "app/cart/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/checkout/page": "app/checkout/page.js"
 }
